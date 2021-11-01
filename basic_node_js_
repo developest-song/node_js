@@ -1,0 +1,112 @@
+# module 
+require('모듈이름') 
+js파일을 모듈화하기 위해 사용하는 내장객체 // /usr/share/doc/nodejs/api 하위 모듈
+
+- custom_module.js ( 커스텀 모듈을 만듦 )
+// 1. exports 객체를 사용해서 sum이라는 변수를 만들고, sum 변수에 function 을 사용해서 하나의 파라미터를 가진 함수식을 대입
+exports.sum = function(max) {
+    // 2. 입력된 값을 최대값으로 1부터 최대값까지 더해서 반환하는 로직
+    return (max+1)*max/2;
+}
+
+// 3. var1 변수에 'NEW VALUE 100' 입력
+exports.var1 = 'NEW VALUE 100';
+
+- home.js ( 커스텀 모듈을 적용 )
+var module = require('./custom_module');
+
+// 1. formatted 특수문자 %d를 사용해서 module.sum( ) 에서 리턴된 숫자값을 출력
+console.log('sum = %d' , module.sum(100));
+
+// 2. formatted 특수문자 %s를 사용해서 module.var1의 문자값을 출력
+console.log('var1 = %s' , module.var1);
+
+var 변수명 = function(파라미터){ 함수식 }
+
+# event - node.js에서 event처리는 events 모듈을 재정의해서 만들어지게 되는데, 어떤 요청에 대해 event 를 사용해서 비동기 처리를 하게되면, 
+단일요청에 대한 thread 대기시간이 없어지기 때문에 동기처리에 비해 프로세스를 좀 더 효율적으로 사용할 수 있다.
+비동기로 인한 callback 이벤트의 개수 증가로 가독성이 떨어지지만 성능면으로는 진보적 형태의 서버 아키텍처라 할 수 있다.
+- EventEmitter : node.js의 모든 이벤트처리가 정의된 기본객체. 이벤트를 사용하기 위해서는 이 객체를 재정의해서 사용해야할 수 있다.
+- on() : 이벤트를 연결하는 함수. 
+ ex) requset객체에 on()함수를 이용해 'data'라는 이벤트를 캐치해서 사용
+- emit() : 이벤트를 발생시키는 함수. on() 함수에서 'data'라는 이벤트가 캐치되기 위해서는 emit('data')의 형태로 이벤트를 발생시켜야 한다.
+
+- custom_event.js
+// 1. 이벤트가 정의되 있는 events 모듈 생성. 이전 버전의 process.EventEmitter() 는 deprecated!
+var EventEmitter = require('events');
+
+// 2. 생성된 이벤트 모듈을 사용하기 위해 custom_object로 초기화
+var custom_object = new EventEmitter();
+
+// 3. events 모듈에 선언되어 있는 on( ) 함수를 재정의 하여 'call' 이벤트를 처리 
+custom_object.on('call', ()=> {
+    console.log('called events!');
+});
+
+// 4. call 이벤트를 강제로 발생
+custom_object.emit('call');
+
+- custom_module_timer.js
+var EventEmitter = require('events');
+// 1. setInterval 함수가 동작하는 interval 값을 설정합니다. 1초에 한번씩 호출
+var sec = 1;
+
+// 2. timer변수를 EventEmitter 로 초기화
+exports.timer = new EventEmitter();
+
+// 3. javascript 내장함수인 setInterval 을 사용해서 1초에 한번씩 timer 객체에 tick 이벤트 발생
+setInterval(function(){
+    exports.timer.emit('tick');
+}, sec*1000);
+
+- call_timer.js
+var module = require('./custom_module_timer');
+
+// 1. module 내부에 선언된 timer객체를 통해 tick 이벤트를 캐치하고, 이벤트 발생시마다 현재시간을 출력
+module.timer.on('tick', function(time){
+    var time = new Date(); // 2. 현재 시간을 가져오기 위한 Date 객체 생성
+    console.log('now:'+time);
+});
+
+# url  - 클라이언트가 요청한 주소를 parsing해서 서버내의 실제 로컬자원만 따로 처리할 수 있게 해준다.
+서버 URI에 해당하는 문자열
+http://www.naver.com/my_page/firstpage?section=15 // 전체 URI
+
+[ http://www.naver.com ] [ /my_page/firstpage ] [ ?section=15 ]
+        도메인                  서버URI           쿼리스트링
+         
+- server_requset.js
+var http = require('http');
+var url = require('url');
+
+var server = http.createServer(function(request,response){
+  // 1. 실제 요청한 주소전체를 콘솔에 출력  
+  console.log(request.url);
+  var parsedUrl = url.parse(request.url);
+  // 2. parsing 된 url 중에 서버URI에 해당하는 pathname 만 따로 저장
+  var resource = parsedUrl.pathname;
+  console.log('resource path=%s',resource);
+
+  // 3. 리소스에 해당하는 문자열이 아래와 같으면 해당 메시지를 클라이언트에 전달
+  if(resource == '/address'){
+    response.writeHead(200, {'Content-Type':'text/html'});
+    response.end('서울특별시 강남구 논현1동 111');
+  }else if(resource == '/phone'){
+    response.writeHead(200, {'Content-Type':'text/html'});
+    response.end('02-3545-1237');
+  }else if(resource == '/name'){
+    response.writeHead(200, {'Content-Type':'text/html'});
+    response.end('Hong Gil Dong');
+  }else{
+    response.writeHead(404, {'Content-Type':'text/html'});
+    response.end('404 Page Not Found');
+  }
+
+});
+
+// 4. 서버 포트 80번으로 변경.
+server.listen(80, function(){
+    console.log('Server is running...');
+});
+        
+node server_requset.js
