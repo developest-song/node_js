@@ -75,7 +75,7 @@ http://www.naver.com/my_page/firstpage?section=15 // 전체 URI
 [ http://www.naver.com ] [ /my_page/firstpage ] [ ?section=15 ]
         도메인                  서버URI           쿼리스트링
          
-- server_requset.js
+- server_request.js
 var http = require('http');
 var url = require('url');
 
@@ -110,3 +110,93 @@ server.listen(80, function(){
 });
         
 node server_requset.js
+
+파일 입출력
+
+- file_read.js (동기, 비동기 방식의 파일 읽기)
+// 1. fs(파일시스템) 모듈 사용
+var fs = require('fs');
+
+// 2. 비동기방식의 파일읽기. 파일을 읽은 후 마지막 파라미터에 넘긴 callback 함수가 호출
+fs.readFile('home.js', 'utf-8', function(error, data) {
+    console.log('01 readAsync: %s',data);
+});
+
+// 3. 동기방식의 파일읽기. 파일을 읽은 후 data 변수에 저장
+var data = fs.readFileSync('home.js', 'utf-8');
+console.log('02 readSync: %s',data);
+
+
+- file_write.js (동기, 비동기 방식의 파일 생성)
+var fs = require('fs');
+
+// 1. 새로 생성할 파일에 입력될 문자열
+var data = "My first data...\r\nhello there!";
+
+// 2. 비동기 방식으로 파일을 생성. 함수의 인자는 앞에서 부터 순서대로 파일명, 입력데이터, 인코딩, 콜백함수
+fs.writeFile('file01_async.txt', data, 'utf-8', function(e){
+    if(e){
+        // 3. 파일생성 중 오류가 발생하면 오류출력
+        console.log(e);
+    }else{
+        // 4. 파일생성 중 오류가 없으면 완료 문자열 출력
+        console.log('01 WRITE DONE!');
+    }
+});
+
+// 5. 동기방식은 callback 함수를 통한 오류처리를 할 수 없기 때문에 함수전체를 try 문으로 예외처리
+try{
+    // 6. 동기 방식으로 파일을 생성. 함수의 인자는 앞에서 부터 순서대로 파일명, 입력데이터, 인코딩
+    fs.writeFileSync('file02_sync.txt', data, 'utf-8');
+    console.log('02 WRITE DONE!');
+}catch(e){
+    console.log(e);
+}
+
+클라이언트에서 파일요청 시 처리
+- hello.html (data가 될 부분)
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Hello node.js</title>
+</head>
+<body>
+    <h1>Hello!</h1>
+    처음 만들어보는 html 페이지 입니다.</br>
+    good to see you~
+</body>
+</html>
+
+- server_request_file.js (html을 받아서 처리할 부분)
+var http = require('http');
+var url = require('url');
+var fs = require('fs');
+
+var server = http.createServer(function(request,response){
+  var parsedUrl = url.parse(request.url);
+  var resource = parsedUrl.pathname;
+
+  // 1. 요청된 자원이 /hello 이면
+  if(resource == '/hello'){
+    // 2. hello.html 파일을 읽은 후
+    fs.readFile('hello.html', 'utf-8', function(error, data) {
+      // 2.1 읽으면서 오류가 발생하면 오류의 내용을
+      if(error){
+        response.writeHead(500, {'Content-Type':'text/html'});
+        response.end('500 Internal Server Error : '+error);
+      // 2.2 아무런 오류가 없이 정상적으로 읽기가 완료되면 파일의 내용을 클라이언트에 전달
+      }else{
+        response.writeHead(200, {'Content-Type':'text/html'});
+        response.end(data);
+      }
+    });
+  }else{
+    response.writeHead(404, {'Content-Type':'text/html'});
+    response.end('404 Page Not Found');
+  }
+});
+
+server.listen(80, function(){
+    console.log('Server is running...');
+});
