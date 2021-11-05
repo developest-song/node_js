@@ -2,7 +2,7 @@
 require('모듈이름') 
 js파일을 모듈화하기 위해 사용하는 내장객체 // /usr/share/doc/nodejs/api 하위 모듈
 
-- custom_module.js ( 커스텀 모듈을 만듦 )
+    [custom_module.j] ( 커스텀 모듈을 만듦 )
 // 1. exports 객체를 사용해서 sum이라는 변수를 만들고, sum 변수에 function 을 사용해서 하나의 파라미터를 가진 함수식을 대입
 exports.sum = function(max) {
     // 2. 입력된 값을 최대값으로 1부터 최대값까지 더해서 반환하는 로직
@@ -12,7 +12,7 @@ exports.sum = function(max) {
 // 3. var1 변수에 'NEW VALUE 100' 입력
 exports.var1 = 'NEW VALUE 100';
 
-- home.js ( 커스텀 모듈을 적용 )
+    [home.js] ( 커스텀 모듈을 적용 )
 var module = require('./custom_module');
 
 // 1. formatted 특수문자 %d를 사용해서 module.sum( ) 에서 리턴된 숫자값을 출력
@@ -22,6 +22,13 @@ console.log('sum = %d' , module.sum(100));
 console.log('var1 = %s' , module.var1);
 
 var 변수명 = function(파라미터){ 함수식 }
+
+ console 객체
+    [consoleLogExample.js]
+console.log('숫자:%d + %d = %d', 10, 29, 10+29);
+console.log('문자열:%s', 'Hello World!');
+console.log('JSON:%j', {name: 'node.js'});
+console.log('문자열', ' 연결.');
 
 # event - node.js에서 event처리는 events 모듈을 재정의해서 만들어지게 되는데, 어떤 요청에 대해 event 를 사용해서 비동기 처리를 하게되면, 
 단일요청에 대한 thread 대기시간이 없어지기 때문에 동기처리에 비해 프로세스를 좀 더 효율적으로 사용할 수 있다.
@@ -74,7 +81,44 @@ http://www.naver.com/my_page/firstpage?section=15 // 전체 URI
 
 [ http://www.naver.com ] [ /my_page/firstpage ] [ ?section=15 ]
         도메인                  서버URI           쿼리스트링
-         
+url.parse(urlStr, [parseQueryString], [slashedDenoteHost])
+ parseQueryString, slashesDenoteHost는 기본값으로 false
+parseQueryString
+ true : url 객체의 query 속성을 객체형식 (querystring 모듈 사용)
+ false : url 객체의 query 속성을 문자열형식
+slashesDenoteHost
+ true : urlStr이 '//foo/bar'인 경우 foo는 host   /bar는 path로 인식
+ false : urlStr이 '//foo/bar'인 경우 //foo/bar 전체를 path로 인식하고 host는 null
+ 
+- urlExample.js
+var url = require('url');
+var parsedObject = url.parse('http://user:pass@host.com:8080/p/a/t/h?query=string#hash');
+ 
+console.log(parsedObject); // url 객체 정보 출력
+console.log(url.format(parsedObject)); // url 객체를 문자열로 출력
+
+querystring 모듈
+parse(str, [sep], [eq], [options]), stringify(obj, [sep], [eq])
+querystring.parse() 쿼리 문자열을 쿼리 객체로 
+querystring.stringify 쿼리 객체를 쿼리 문자열로 
+
+- querystringExample.js
+var querystring = require('querystring');
+ 
+var qStr = 'where=nexearch&query=querystring&sm=top_hty&fbm=1&ie=utf8';
+var qObj = querystring.parse(qStr); // 일반적인 사용
+var qObj2 = querystring.parse(qStr, '&', '=', { maxKeys: 3 });
+// 구분 문자열이 다를 경우 &와 = 자리에 해당 문자를 넣어 사용합니다.
+// maxKeys로 3을 넘겨주면 값을 3개만 가져옵니다.
+ 
+console.log(qObj); // 쿼리의 값들을 모두 가져옴
+console.log(querystring.stringify(qObj));
+console.log(querystring.stringify(qObj, '; ', '->'));
+ 
+console.log(qObj2); // 쿼리의 값을 3개만 가져옴
+console.log(querystring.stringify(qObj2));
+console.log(querystring.stringify(qObj2, '; ', '->'));
+
 - server_request.js
 var http = require('http');
 var url = require('url');
@@ -110,6 +154,8 @@ server.listen(80, function(){
 });
         
 node server_requset.js
+
+
 
 파일 입출력
 
@@ -152,6 +198,9 @@ try{
 }catch(e){
     console.log(e);
 }
+
+fs 모듈
+
 
 클라이언트에서 파일요청 시 처리
 - hello.html (data가 될 부분)
@@ -337,3 +386,91 @@ var server = http.createServer(function(request,response){
 server.listen(80, function(){
     console.log('Server is running...');
 });
+
+process 객체
+- processExample.js
+console.log(process.env);           // 컴퓨터 환경과 관련된 정보를 가진 객체
+console.log(process.version);       // node.js의 버전
+console.log(process.versions);      // node.js와 연관된 프로그램들의 버전을 가진 객체
+console.log(process.arch);          // 프로세서의 아키텍처(arm/ia32/x64)
+console.log(process.platform);      // 플랫폼(win32/linux/sunos/freebsd/darwin)
+console.log(process.memoryUsage()); // 메모리 사용 정보를 가진 객체
+console.log(process.uptime());      // 현재 프로그램이 실행된 시간
+
+- processArgv.js
+process.argv.forEach(function(val, index, array) { // 매개변수를 받아서 return
+    console.log(index + ': ' + val);
+});
+
+node 명령어 - 대화형 인터프리터 실행(REPL:Read Eval Print Loop)
+
+exports, require() 사용자 모듈
+- circle.js
+var PI = Math.PI;
+ 
+exports.area = function (r) {
+    return PI * r * r;
+};
+ 
+exports.circumference = function (r) {
+    return 2 * PI * r;
+};
+
+- foo.js
+var circle = require('./circle.js');
+console.log( 'The area of a circle of radius 4 is ' + circle.area(4));
+
+module.exports 
+- square.js
+module.exports = function(width) {
+    return {
+        area: function() {
+            return width * width;
+        }
+    };
+}
+
+- bar.js
+var square = require('./square.js');
+var mySquare = square(2);
+console.log('My square is ' + mySquare.area());
+
+모듈로 속성 지정
+// mymodule.js
+module.exports = "사용자 모듈입니다.";
+
+// mymain.js
+var mymodule = require('./mymodule.js');
+console.log(mymodule);
+
+require할때 확장자를 입력하지 않으면 일단 .js를 붙여 찾고 다음 폴더명을 찾는다 그 아래의 index.js를 찾음
+
+os 모듈
+- osExample.js
+var os = require('os');
+ 
+console.log(os.tmpdir());       // 임시 저장 폴더의 위치
+console.log(os.endianness());   // CPU의 endianness(BE 또는 LE)
+console.log(os.hostname());     // 호스트 이름(컴퓨터 이름)
+console.log(os.type());         // 운영체제 이름
+console.log(os.platform());     // 운영체제 플랫폼
+console.log(os.arch());         // 운영체제 아키텍처
+console.log(os.release());      // 운영체제 버전
+console.log(os.uptime());       // 운영체제가 실행된 시간
+console.log(os.loadavg());      // 로드 에버리지 정보를 담은 배열
+console.log(os.totalmem());     // 시스템의 총 메모리
+console.log(os.freemem());      // 시스템의 가용 메모리
+console.log(os.cpus());         // CPU의 정보를 담은 객체
+console.log(os.networkInterfaces()); // 네트워크 인터페이스 정보를 담은 배열
+console.log(os.EOL);            // 운영체제의 개행 문자(\n 이나 \r\n 같은 문자)
+
+util 모듈 
+util.format - console.log()와 비슷, 차이점 util.format은 문자열로 반환
+
+- utilFormat.js
+var util = require('util');
+var data = util.format('%d, %s, %j', 10, 'abc', {name: 'node.js'});
+
+console.log(data);
+console.log('%d, %s, %j', 10, 'abc', {name: 'node.js'});
+결과 동일 
