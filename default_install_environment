@@ -1,0 +1,65 @@
+putty.org
+sudo timedatectl set-timezon "Asia/Seoul"
+sudo apt -y install language-pack-ko 
+
+nl /etc/default/locale
+sudo update-local LANG=ko_KR.UTF-8 LC_MESSAGES=POSIX
+sudo apt -y install gcc
+
+sudo -i
+sudo passwd
+su -
+
+dpkg -l | grep ssh
+apt -y install openssh-server
+
+apt -y install traceroute 라우팅확인
+traceroute lael.be
+iptables -t nat -L --line-numbers
+
+pre, post routing 설명글 
+https://blog.lael.be/post/69
+
+
+sudo iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+sudo iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+​방화벽해제 sudo systemctl stop ufw (disable 영구적)
+
+
+node js 기초문법 및 서버 구축(centos)
+https://javafa.gitbooks.io/nodejs_server_basic/content/chapter2.html
+
+ubuntu node js 설치 
+https://blog.naver.com/soul_num_22/222463238747
+
+######## node js 설치 ##########
+sudo apt-get install curl
+curl은 사용자 상호 작용 없이 작동하도록 설계된 서버에서 또는 서버로 데이터를 전송하기 위한 명령줄 유틸리티
+curl을 사용하면 HTTP, HTTPS, SCP , SFTP 및 FTP 등 지원되는 프로토콜 중 하나를 사용하여 
+데이터를 다운로드하거나 업로드할 수 있다.
+curl은 전송을 재개하고 대역폭을 제한하며 프록시 지원, 사용자 인증 등을 수행할 수 있는 다양한 옵션을 제공한다.
+
+node source (github)
+https://github.com/nodesource/distributions/blob/master/README.md
+
+Node.js LTS (v16.x)
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+빌드 에센셜 설치 --- npm install 시 에러 방지
+sudo apt-get install build-essential
+
+설치 및 버전확인
+$ node -v
+v16.13.0
+$ npm -v
+8.1.0
+#########################
+node *.js -> 서버 구동
+
+express, forever 설치 방법
+https://ppost.tistory.com/entry/%EC%9A%B0%EB%B6%84%ED%88%AC-1804%EC%97%90-%EC%84%9C%EB%B2%84%ED%99%98%EA%B2%BD-nodemysql%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0
+
+npm install express --save
