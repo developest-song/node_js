@@ -474,3 +474,59 @@ var data = util.format('%d, %s, %j', 10, 'abc', {name: 'node.js'});
 console.log(data);
 console.log('%d, %s, %j', 10, 'abc', {name: 'node.js'});
 결과 동일 
+
+이벤트의 연결
+on() - 이벤트를 계속 연결한 상태를 유지
+once() - 한 번만 연결한 후 제거됨.
+
+- bindEvent.js
+// addListener 메소드
+process.addListener('exit', function() {
+    console.log('exit 이벤트 연결');
+});
+ 
+// on 메소드
+process.on('exit', function(code) {
+    console.log('종료 코드: ' + code);
+});
+ 
+// once 메소드
+process.once('uncaughtException', function(err) {
+    console.log('에러 메시지: ' + err);
+});
+ 
+// 존재하지 않는 함수를 실행시킵니다. -> 예외 발생 -> uncaughtException 이벤트 발생
+nonexistentFunc();
+console.log('예외가 발생한 이후 구문은 실행되지 않습니다.');
+
+- removeEvent.js
+// 이벤트 핸들러 함수
+var exitListener = function() {
+    console.log('프로그램 종료');
+};
+ 
+// 이벤트 연결
+process.on('exit', exitListener);
+ 
+// 이벤트 제거
+process.removeListener('exit', exitListener);
+//process.removeAllListeners('exit'); // process 객체 exit 이벤트의 모든 리스너 제거
+//process.removeAllListeners();       // process 객체의 모든 이벤트 리스너 제거
+// 이벤트를 제거 했기 때문에 console.log는 출력되지 않는다.
+
+- limitEventCount.js
+기본값으로 한 이벤트에 10개의 이벤트 핸들러 작성
+11개 이상을 하고 싶으면 setMaxListener() 메소드를 사용하여 최대 허용 개수 값을 넘겨주면 됨
+process.setMaxListeners(11);
+ 
+process.on('exit', function() { console.log('프로그램 종료1'); });
+process.on('exit', function() { console.log('프로그램 종료2'); });
+process.on('exit', function() { console.log('프로그램 종료3'); });
+process.on('exit', function() { console.log('프로그램 종료4'); });
+process.on('exit', function() { console.log('프로그램 종료5'); });
+process.on('exit', function() { console.log('프로그램 종료6'); });
+process.on('exit', function() { console.log('프로그램 종료7'); });
+process.on('exit', function() { console.log('프로그램 종료8'); });
+process.on('exit', function() { console.log('프로그램 종료9'); });
+process.on('exit', function() { console.log('프로그램 종료10'); });
+process.on('exit', function() { console.log('프로그램 종료11'); });
