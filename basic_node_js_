@@ -530,3 +530,54 @@ process.on('exit', function() { console.log('프로그램 종료8'); });
 process.on('exit', function() { console.log('프로그램 종료9'); });
 process.on('exit', function() { console.log('프로그램 종료10'); });
 process.on('exit', function() { console.log('프로그램 종료11'); });
+
+- server.js
+const express = require('express');
+const app = express();
+
+const server = app.listen(3000, () => {
+        console.log('Start Server : localhost:3000')
+});
+
+//html을 사용하기 위한 사전 작업 (ejs) 
+app.set('views', __dirname + '/views'); // __dirname - 현재 디렉토리
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
+
+// use_render
+app.get('/', function (req, res) {
+  res.render('index.html') //
+})
+
+app.get('/about', function (req, res) {
+  res.send('about page')
+})
+node server.js
+
+- ./views/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name"viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello!</h1>
+    <table>
+            <tr><td>AAAA</td><td>BBB</td></tr>
+    </table>
+
+</body>
+</html>
+
+
+ejs (embedded javascript) - html안에서 자바스크립트를 쓸 수 있게 만드는 템플릿
+npm ejs --save
+
+npm express --save
+
+## google에서 npm xxxx로 검색할 경우 이미 만들어져있는 모듈들이 많아서 가져다 쓰면된다
+ex) npm nodemailer -> npm install nodemailer
+
+
