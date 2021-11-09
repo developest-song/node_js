@@ -1,0 +1,88 @@
+api.js
+
+* uuid-apikey (API키를 생성해주는 모듈)
+npm install uuid-apikey
+
+
+const express = require('express'); 
+const app = express();
+const uuidAPIKey = require('uuid-apikey');
+
+const server = app.listen(3001, () => {
+        console.log('Start Server : localhost:3001');
+});
+
+// console.log(uuidAPIKey.create()); key 생성
+
+const key = { //test로 apikey 보관 , 실제론 uuid만 DB에 보관해둬도 .check method로 가능한듯
+  apiKey: 'Y2QZE46-4A6M9AG-PME3WS3-HGT7KBE', // 이걸로 접근
+  uuid: 'f0aff710-228d-44aa-b51c-3e648c3479ad'
+};
+
+
+app.get('/api/users/:apikey/:type', async (req, res) => { //:type 콜론이 있는 패스에는 어떤 값 이든 파라미터로 받을 수 있다.
+        let {
+                apikey,
+                type
+        } = req.params;
+
+        if(!uuidAPIKey.isAPIKey(apikey) || !uuidAPIKey.check(apikey, key.uuid)){ // .isAPIKey로 모듈에 맞는 apikey형식이 맞는지 검사 & 받은 apikey와 key.uuid를 확인
+                res.send('apikey in not valid.');
+        }else{
+
+                if(type == 'seoul'){
+                        let data = [
+                                {name:"Song", city:"seoul"},
+                                {name:"Kim", city:"seoul"}
+                        ];
+                        res.send(data);
+                }else if(type =='jeju'){
+                        let data = [
+                                {name:"Lee", city: "jeju"},
+                                {name:"Park", city: "jeju"}
+                        ];
+                        res.send(data);
+                }else{
+                        res.send('Type is not correct.');
+                }
+        }
+
+});
+
+app.get('/api/sales/:apikey/:year', async (req, res) => {
+        let {
+                apikey,
+                year
+        } = req.params;
+
+        if(type == '2019'){
+                let data = [
+                        {product:"반도체",amount:392884000},
+                        {product:"냉장고",amount:288400000},
+                ];
+                res.send(data);
+        }else if(type =='2020'){
+                let data = [
+                        {product:"반도체",amount:928800000},
+                        {product:"냉장고",amount:488400000},
+                ];
+                res.send(data);
+        }else{
+                res.send('Type is not correct.');
+        }
+
+test)
+node api.js
+ip_address:3001/api/users/Y2QZE46-4A6M9AG-PME3WS3-HGT7KBE/seoul (postman)
+postman : seoul - let data
+[
+    {
+        "name": "Song",
+        "city": "seoul"
+    },
+    {
+        "name": "Kim",
+        "city": "seoul"
+    }
+]
+
