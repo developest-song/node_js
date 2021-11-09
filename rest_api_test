@@ -1,7 +1,7 @@
 api.js
 
 * uuid-apikey (API키를 생성해주는 모듈)
-npm install uuid-apikey
+* npm install uuid-apikey
 
 
 const express = require('express'); 
@@ -29,7 +29,6 @@ app.get('/api/users/:apikey/:type', async (req, res) => { //:type 콜론이 있�
         if(!uuidAPIKey.isAPIKey(apikey) || !uuidAPIKey.check(apikey, key.uuid)){ // .isAPIKey로 모듈에 맞는 apikey형식이 맞는지 검사 & 받은 apikey와 key.uuid를 확인
                 res.send('apikey in not valid.');
         }else{
-
                 if(type == 'seoul'){
                         let data = [
                                 {name:"Song", city:"seoul"},
@@ -55,21 +54,26 @@ app.get('/api/sales/:apikey/:year', async (req, res) => {
                 year
         } = req.params;
 
-        if(type == '2019'){
-                let data = [
-                        {product:"반도체",amount:392884000},
-                        {product:"냉장고",amount:288400000},
-                ];
-                res.send(data);
-        }else if(type =='2020'){
-                let data = [
-                        {product:"반도체",amount:928800000},
-                        {product:"냉장고",amount:488400000},
-                ];
-                res.send(data);
+        if(!uuidAPIKey.isAPIKey(apikey) || !uuidAPIKey.check(apikey, key.uuid)){ // .isAPIKey로 모듈에 맞는 apikey형식이 맞는지 검사 & 받은 apikey와 key.uuid를 확인
+                res.send('apikey in not valid.');
         }else{
-                res.send('Type is not correct.');
+                if(type == '2019'){
+                        let data = [
+                                {product:"반도체",amount:392884000},
+                                {product:"냉장고",amount:288400000},
+                        ];
+                        res.send(data);
+                }else if(type =='2020'){
+                        let data = [
+                                {product:"반도체",amount:928800000},
+                                {product:"냉장고",amount:488400000},
+                        ];
+                        res.send(data);
+                }else{
+                        res.send('Type is not correct.');
+                }
         }
+});
 
 test)
 node api.js
